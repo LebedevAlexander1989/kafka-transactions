@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import by.javaguru.estore.transfers.error.TransferServiceException;
@@ -19,9 +20,9 @@ import by.javaguru.estore.transfers.model.TransferRestModel;
 public class TransferServiceImpl implements TransferService {
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-	private KafkaTemplate<String, Object> kafkaTemplate;
-	private Environment environment;
-	private RestTemplate restTemplate;
+	private final KafkaTemplate<String, Object> kafkaTemplate;
+	private final Environment environment;
+	private final RestTemplate restTemplate;
 
 	public TransferServiceImpl(KafkaTemplate<String, Object> kafkaTemplate, Environment environment,
 			RestTemplate restTemplate) {
@@ -31,6 +32,7 @@ public class TransferServiceImpl implements TransferService {
 	}
 
 	@Override
+	@Transactional
 	public boolean transfer(TransferRestModel transferRestModel) {
 		WithdrawalRequestedEvent withdrawalEvent = new WithdrawalRequestedEvent(transferRestModel.getSenderId(),
 				transferRestModel.getRecepientId(), transferRestModel.getAmount());
